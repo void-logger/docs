@@ -41,4 +41,4 @@ console.log(result.data.name)
 
 Some higher-level interaction helpers can still throw when Discord rejects an already-constructed payload, especially in acknowledgement paths such as `showModal(...)`.
 
-That is usually a payload-construction problem, not a contradiction of the result model. Manager and REST flows still follow `ChameleonAPIResult<T>`; direct interaction acknowledgement helpers may need to throw immediately because Discord accepts only one response path for that interaction.
+That is usually a payload-construction problem, not a contradiction of the result model. Manager and REST flows still follow `ChameleonAPIResult<T>`. Direct interaction acknowledgement helpers may need to throw immediately, because Discord accepts only one response path for that interaction.
