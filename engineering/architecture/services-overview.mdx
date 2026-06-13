@@ -23,12 +23,12 @@ graph TD
 
 ## Services
 
-### API Gateway
+### API gateway
 The public-facing entry point. Handles routing, rate limiting, and authentication checks before forwarding requests to downstream services. Deployed on [Platform].
 
 **Repo:** `api-gateway`
 
-### Auth Service
+### Auth service
 Manages user identity, sessions, and permissions. Integrates with your identity provider for SSO. All authentication decisions are delegated here — other services call Auth to validate tokens.
 
 **Repo:** `auth-service`
@@ -38,16 +38,16 @@ The main application backend. Handles business logic for the primary product dom
 
 **Repo:** `core-api`
 
-### Worker Service
+### Worker service
 Processes background jobs: email delivery, async data processing, scheduled tasks, and webhook delivery. Consumes from the job queue.
 
 **Repo:** `worker`
 
 ## Communication patterns
 
-- **Synchronous:** Services communicate via internal HTTP APIs. Auth headers are passed through and validated at each service boundary.
+- **Synchronous:** Services communicate via internal HTTP APIs. Each service boundary passes through and validates auth headers.
 - **Asynchronous:** Workers consume from the job queue. The Core API publishes jobs; workers process them independently.
-- **Events:** Significant domain events (user created, subscription changed) are published to the event bus for downstream consumers.
+- **Events:** The Core API publishes significant domain events (user created, subscription changed) to the event bus for downstream consumers.
 
 ## Environments
 
