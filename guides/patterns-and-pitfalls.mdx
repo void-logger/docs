@@ -65,7 +65,7 @@ Good:
 ```ts
 const surveyModal = modal('survey', 'Survey')
   .add(field.short('name', 'Your name'))
-  .handle(async (ctx) => {
+  .execute(async (ctx) => {
     await ctx.reply({ content: ctx.fields.name, ephemeral: true })
   })
 

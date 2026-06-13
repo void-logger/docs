@@ -8,21 +8,17 @@ description: "How commands, modal fields, and event payloads use TypeScript, and
 Chameleon already has good type inference in a few places:
 
 - event payload narrowing by event name and `event.type`
-- command option inference through `opt.*`
-- modal field inference through `modal(...).add(...).handle(...)`
+- command option inference through `command(...)`, `subcommand(...)`, and `opt.*`
+- modal field inference through `modal(...).add(...).execute(...)`
 - typed component contexts for many interaction flows
 
 ## Slash command options
 
 ```ts
-const ping = defineCommand({
-  name: 'ping',
-  description: 'Ping a user',
-  options: {
-    target: opt.user('User to ping', { required: true }),
-    loud: opt.boolean('Whether to ping loudly')
-  },
-  execute: async (ctx) => {
+const ping = command('ping', 'Ping a user')
+  .user('target', 'User to ping', { required: true })
+  .boolean('loud', 'Whether to ping loudly')
+  .execute(async (ctx) => {
     const user = ctx.options.target
     const loud = ctx.options.loud
 
@@ -30,11 +26,17 @@ const ping = defineCommand({
       content: loud ? `PING ${user.id}` : `ping ${user.id}`,
       ephemeral: true
     })
-  }
-})
+  })
 ```
 
 `ctx.options.target` is inferred from the option type, not manually cast.
+
+The newer command DSL also preserves richer inference for:
+
+- `mentionable` as `User | Role`
+- `attachment` as an uploaded `Attachment`
+- selected values from `choices(...)`
+- nested subcommands and subcommand groups
 
 ## Modal fields
 
@@ -45,7 +47,7 @@ const profileModal = modal('profile', 'Profile')
     field.checkbox('accept_rules', 'Accept rules'),
     field.fileUpload('attachment', 'Attachment', { required: false })
   )
-  .handle(async (ctx) => {
+  .execute(async (ctx) => {
     ctx.fields.name
     ctx.fields.accept_rules
     ctx.attachments.attachment

@@ -15,8 +15,10 @@ Reach for this group when you are bootstrapping a process, handling events, or t
 
 ## Commands
 
-- `defineCommand`: define a slash command with typed execution context
-- `defineSubcommand`: compose subcommand trees
+- `command`: start a fluent slash command definition
+- `subcommand`: define a typed subcommand
+- `subcommandGroup`: define nested subcommand groups
+- `choice` and `choices`: build typed command choices
 - `opt.*`: typed slash option builders
 - `CommandContext`: interaction context for command handlers
 - `CommandManager`: command and modal registration surface

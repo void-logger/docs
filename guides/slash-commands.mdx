@@ -6,21 +6,16 @@ description: "Define commands, option schemas, and subcommands with typed contex
 ## Basic command
 
 ```ts
-import { defineCommand, opt } from '@impulsedev/chameleon'
+import { command } from '@impulsedev/chameleon'
 
-const echo = defineCommand({
-  name: 'echo',
-  description: 'Echo text back',
-  options: {
-    text: opt.string('Text to send back', { required: true })
-  },
-  execute: async (ctx) => {
+const echo = command('echo', 'Echo text back')
+  .string('text', 'Text to send back', { required: true })
+  .execute(async (ctx) => {
     await ctx.reply({
       content: ctx.options.text,
       ephemeral: true
     })
-  }
-})
+  })
 ```
 
 ## Register it
@@ -38,32 +33,85 @@ client.commands.registerGuild(guildId, echo)
 ## Subcommands
 
 ```ts
-const admin = defineCommand({
-  name: 'admin',
-  description: 'Admin tools',
-  subcommands: {
-    ban: defineSubcommand({
-      description: 'Ban a member',
-      options: {
-        target: opt.user('User to ban', { required: true }),
-        reason: opt.string('Reason')
-      },
-      execute: async (ctx) => {
-        const target = ctx.options.target
-        const reason = ctx.options.reason
-        await ctx.reply(`Would ban ${target.id} for ${reason ?? 'no reason'}`)
-      }
+import { command, subcommand } from '@impulsedev/chameleon'
+
+const admin = command('admin', 'Admin tools').subcommand(
+  'ban',
+  subcommand('Ban a member')
+    .user('target', 'User to ban', { required: true })
+    .string('reason', 'Reason')
+    .execute(async (ctx) => {
+      const target = ctx.options.target
+      const reason = ctx.options.reason
+      await ctx.reply(`Would ban ${target.id} for ${reason ?? 'no reason'}`)
     })
-  }
-})
+)
 ```
+
+## Subcommand groups, choices, and richer option types
+
+```ts
+import { command, subcommand, subcommandGroup, choice, choices } from '@impulsedev/chameleon'
+
+const toolbox = command('toolbox', 'Command DSL demo')
+  .setPermissions('MANAGE_GUILD')
+  .group(
+    'demo',
+    subcommandGroup('Demo subcommands').subcommand(
+      'inspect',
+      subcommand('Inspect a user or role')
+        .string(
+          'mode',
+          'Inspection mode',
+          choices(
+            choice('Quick', 'quick'),
+            choice('Full', 'full')
+          ),
+          { required: true }
+        )
+        .mentionable('target', 'User or role to inspect', { required: true })
+        .attachment('file', 'Optional file to include')
+        .execute(async (ctx) => {
+          await ctx.reply({
+            content: `${ctx.options.mode} -> ${ctx.options.target.id}`,
+            ephemeral: true
+          })
+        })
+    )
+  )
+```
+
+Supported chat input option types:
+
+- `string`
+- `integer`
+- `number`
+- `boolean`
+- `user`
+- `channel`
+- `role`
+- `mentionable`
+- `attachment`
+
+## Permissions
+
+Use `.setPermissions(...)` to set Discord `default_member_permissions` on the command.
+
+Accepted inputs follow the framework bitfield conventions, so these all work:
+
+- permission names like `'MANAGE_GUILD'`
+- raw bitfields like `BigInt(...)`
+- arrays of permission names
+- `PermissionsBitField`
+
+`setDefaultMemberPermissions(...)` also exists as a compatibility alias, but `setPermissions(...)` is the recommended surface.
 
 ## Important behavior
 
-`defineCommand(...)` will throw if you create a command with neither:
+Command definitions must provide either:
 
 - `execute`
-- nor any subcommands
+- or subcommands
 
 That catches one class of invalid command definitions early.
 

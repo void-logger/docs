@@ -6,18 +6,15 @@ description: "Register slash commands, classic message components, and interacti
 ## Register a command
 
 ```ts
-import { defineCommand } from '@impulsedev/chameleon'
+import { command } from '@impulsedev/chameleon'
 
-const ping = defineCommand({
-  name: 'ping',
-  description: 'Return latency information',
-  execute: async (ctx) => {
+const ping = command('ping', 'Return latency information')
+  .execute(async (ctx) => {
     await ctx.reply({
       content: `Gateway: ${client.gateway.ms}ms`,
       ephemeral: true
     })
-  }
-})
+  })
 
 client.commands.register(ping)
 ```

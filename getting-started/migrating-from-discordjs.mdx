@@ -115,18 +115,24 @@ That means:
 Instead of subclassing command structures or stitching builders together ad hoc, Chameleon leans on definition helpers:
 
 ```ts
-const ping = defineCommand({
-  name: 'ping',
-  description: 'Check latency',
-  execute: async (ctx) => {
+const ping = command('ping', 'Check latency')
+  .execute(async (ctx) => {
     await ctx.reply({ content: 'pong' })
-  }
-})
+  })
 
 client.commands.register(ping)
 ```
 
 For slash command options, `ctx.options` is inferred from the option builders you use.
+
+If you are coming from `discord.js` command builders, the nearest equivalent to `setDefaultMemberPermissions(...)` is:
+
+```ts
+const admin = command('admin', 'Admin tools')
+  .setPermissions('MANAGE_GUILD')
+```
+
+That writes Discord `default_member_permissions` in the deployed command payload.
 
 ## Components and modals are more typed than they look
 
@@ -143,7 +149,7 @@ const surveyModal = modal('survey', 'Survey')
     field.short('name', 'Your name'),
     field.checkbox('accept', 'Accept rules')
   )
-  .handle(async (ctx) => {
+  .execute(async (ctx) => {
     await ctx.reply({
       content: `name=${ctx.fields.name}, accept=${ctx.fields.accept}`,
       ephemeral: true
@@ -161,7 +167,7 @@ That is a different style from `discord.js`, but it removes a lot of manual pars
 | rich entity instance methods | manager methods on `client.*` |
 | `try/catch` around many REST calls | check `result.ok` |
 | nested cache trees | flat store plus manager fetches |
-| builder-heavy modal parsing by hand | `modal(...).add(...).handle(...)` with `ctx.fields` |
+| builder-heavy modal parsing by hand | `modal(...).add(...).execute(...)` with `ctx.fields` |
 
 ## Migration strategy that usually works
 
@@ -171,7 +177,7 @@ Move in this order:
 
 1. Port client bootstrapping and intents.
 2. Port event handlers and replace entity-instance methods with managers.
-3. Replace command registration with `defineCommand(...)`.
+3. Replace command registration with `command(...)`.
 4. Replace component and modal flows with the Chameleon builders.
 5. Only then revisit caching assumptions and optimize store access.
 

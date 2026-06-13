@@ -5,12 +5,15 @@ description: "A practical reference for the interactive surfaces: slash commands
 
 ## Commands
 
-The command API is centered on definitions, not subclasses.
+The command API is centered on fluent builders plus typed execution contexts.
 
 Primary exports:
 
-- `defineCommand`
-- `defineSubcommand`
+- `command`
+- `subcommand`
+- `subcommandGroup`
+- `choice`
+- `choices`
 - `opt.*`
 - `CommandContext`
 - `CommandManager`
@@ -18,18 +21,37 @@ Primary exports:
 Typical flow:
 
 ```ts
-const ping = defineCommand({
-  name: 'ping',
-  description: 'Health check',
-  execute: async (ctx) => {
+const ping = command('ping', 'Health check')
+  .execute(async (ctx) => {
     await ctx.reply({ content: 'pong' })
-  }
-})
+  })
 
 client.commands.register(ping)
 ```
 
 Option builders infer `ctx.options` based on the definition.
+
+Supported chat input option types:
+
+- `string`
+- `integer`
+- `number`
+- `boolean`
+- `user`
+- `channel`
+- `role`
+- `mentionable`
+- `attachment`
+
+Command structure helpers:
+
+- `subcommand(...)`
+- `subcommandGroup(...)`
+
+Command metadata helpers:
+
+- `.setPermissions(...)`
+- `.setDefaultMemberPermissions(...)`
 
 ## Classic message components
 
@@ -94,7 +116,7 @@ const survey = modal('survey', 'Survey')
     field.short('name', 'Your name'),
     field.checkbox('accept', 'Accept rules')
   )
-  .handle(async (ctx) => {
+  .execute(async (ctx) => {
     console.log(ctx.fields.name, ctx.fields.accept)
   })
 ```
@@ -121,10 +143,10 @@ That split reflects Discord’s interaction model rather than trying to collapse
 
 If you are writing application code rather than extending the framework internals, start here:
 
-- slash commands: `defineCommand`, `opt.*`
+- slash commands: `command(...)`, `subcommand(...)`, `subcommandGroup(...)`, `choice(...)`, `choices(...)`
 - buttons: `Button.*`
 - classic layouts: `ActionRow.of(...)`
 - V2 layouts: `Container.stack(...)`, `Section.text(...).accessory(...)`
-- modals: `modal(...).add(...).handle(...)`, `field.*`, `client.commands.registerModal(...)`
+- modals: `modal(...).add(...).execute(...)`, `field.*`, `client.commands.registerModal(...)`
 
 These are the highest-value interactive APIs in the current framework surface.
