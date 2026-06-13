@@ -45,7 +45,11 @@
     "timestamp": true
   },
   "contextual": {
-    "options": ["copy", "view", "assistant"]
+    "options": [
+      "copy",
+      "view",
+      "assistant"
+    ]
   },
   "navigation": {
     "tabs": [
@@ -87,6 +91,7 @@
             "group": "Bot flows",
             "pages": [
               "guides/slash-commands",
+              "guides/patterns-and-pitfalls",
               "guides/commands-and-components",
               "guides/components-v2-and-modals",
               "guides/collectors-and-files",

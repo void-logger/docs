@@ -29,6 +29,12 @@ const echo = defineCommand({
 client.commands.register(echo)
 ```
 
+For guild-scoped iteration during development, you can register to a single guild:
+
+```ts
+client.commands.registerGuild(guildId, echo)
+```
+
 ## Subcommands
 
 ```ts
@@ -64,3 +70,13 @@ That catches one class of invalid command definitions early.
 ## Deployment note
 
 The command manager deploys registered commands through the application command API. If the client is already ready, deployment happens immediately. Otherwise it is deferred until the ready flow completes.
+
+## Load commands from a directory
+
+If you keep commands in separate files, the command manager can load them from disk:
+
+```ts
+await client.commands.load('./commands')
+```
+
+Each loaded module should default-export a command definition.

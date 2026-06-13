@@ -1,0 +1,163 @@
+---
+title: "Patterns and pitfalls"
+description: "The habits that fit Chameleon well, and the assumptions that tend to cause friction when coming from other Discord frameworks."
+---
+
+## Treat entities as data
+
+The most important mental model is simple:
+
+- entities are mostly plain objects
+- managers perform actions
+- relations are often IDs or lightweight references
+
+Good:
+
+```ts
+const result = await client.messages.fetch(channelId, messageId)
+if (!result.ok) return
+
+await client.messages.send(channelId, {
+  content: 'pong',
+  reply: { messageId: result.data.id }
+})
+```
+
+Avoid expecting rich instance methods on cached entities.
+
+## Check `result.ok` at the edge
+
+Most manager and REST flows return `ChameleonAPIResult<T>`.
+
+Good:
+
+```ts
+const result = await client.guilds.fetch(guildId)
+
+if (!result.ok) {
+  console.error(result.status, result.error)
+  return
+}
+
+useGuild(result.data)
+```
+
+Do not write the rest of your app as if every failed request will throw.
+
+## Assume cache is a performance layer, not the source of truth
+
+Some managers are cache-first, but that does not mean all data is already present.
+
+Worth remembering:
+
+- `fetch(..., false)` usually prefers cache when available
+- list methods often hydrate cache entries as a side effect
+- some operations depend on an existing cached source
+
+One concrete example is `client.channels.clone(...)`: it clones from cached channel data, so fetch first if you are not sure the channel is hot.
+
+## Register modal submit handlers explicitly
+
+Defining a modal and opening a modal are not the same thing as handling its submit.
+
+Good:
+
+```ts
+const surveyModal = modal('survey', 'Survey')
+  .add(field.short('name', 'Your name'))
+  .handle(async (ctx) => {
+    await ctx.reply({ content: ctx.fields.name, ephemeral: true })
+  })
+
+client.commands.registerModal(surveyModal)
+```
+
+If you skip `registerModal(...)`, the modal can open correctly and still fail on submit.
+
+## Distinguish component visuals from component handlers
+
+`Button.primary(...)` is a reusable button definition.
+
+That is perfect for message payloads:
+
+```ts
+ActionRow.of(
+  Button.primary('confirm', 'Confirm')
+)
+```
+
+When the component also needs runtime behavior, register a handler definition:
+
+```ts
+client.components.register(
+  defineButton({
+    customId: 'confirm',
+    style: 'primary',
+    label: 'Confirm',
+    execute: async (ctx) => {
+      await ctx.reply({ content: 'Confirmed', ephemeral: true })
+    }
+  })
+)
+```
+
+## Use guild-scoped managers when the resource is guild-scoped
+
+Prefer:
+
+```ts
+const members = client.guilds.members(guildId)
+const roles = client.guilds.roles(guildId)
+```
+
+That matches the actual data model better than pretending members or roles are global standalone resources.
+
+## Use helper constants when they exist
+
+If the framework already ships readable constants, prefer them over magic numbers.
+
+Example:
+
+```ts
+import { Colors } from '@impulsedev/chameleon'
+
+const role = await client.guilds.roles(guildId).create({
+  name: 'Release manager',
+  color: Colors.Green
+})
+```
+
+That is easier to read than raw values like `0x57f287`.
+
+## Expect timeouts to resolve, not explode
+
+Collectors are intentionally calm by default:
+
+- `awaitMessages(...)` resolves with the messages collected so far when time runs out
+- `awaitComponent(...)` resolves with `null` on timeout
+
+Write that timeout branch explicitly instead of relying on exceptions.
+
+## Use resolver helpers when you want lazy references
+
+`resolveUser`, `resolveChannel`, `resolveGuild`, and `resolveRole` are useful when you want to pass references around without eagerly fetching them.
+
+These helpers return:
+
+- the cached entity when it exists
+- otherwise a lightweight stub with `id`
+- and, where possible, a `fetch()` helper
+
+That pattern fits Chameleon’s “data first, actions through managers” model well.
+
+## Validate newer Discord surfaces against reality
+
+The framework is in a good place around typed events, result objects, and modal builder ergonomics.
+
+Newer Discord surfaces still deserve extra care:
+
+- Components V2 layouts
+- modal upload flows
+- newer specialized managers you may not use every day
+
+For those paths, trust the docs, but still test the real Discord behavior end-to-end before calling a workflow production-ready.

@@ -91,11 +91,13 @@ This is often a better fit than assuming the full member list is already hot in 
 ## Role operations
 
 ```ts
+import { Colors } from '@impulsedev/chameleon'
+
 const roles = client.guilds.roles(guildId)
 
 const created = await roles.create({
   name: 'Release manager',
-  color: 0x57f287
+  color: Colors.Green
 }, 'Create release role')
 
 if (created.ok) {

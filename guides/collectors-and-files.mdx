@@ -58,3 +58,9 @@ const file = new AttachmentBuilder('./report.txt')
 V2 modal upload fields surface submitted files through `ctx.attachments[fieldId]`.
 
 That gives you resolved attachment objects rather than only raw IDs.
+
+## Worth knowing
+
+- `awaitMessages(...)` resolves with the messages collected so far when time runs out
+- `awaitComponent(...)` resolves to `null` on timeout, so timeout handling should be explicit
+- `AttachmentBuilder` works with both disk paths and in-memory buffers

@@ -48,6 +48,8 @@ const surveyModal = modal('survey_modal', 'Survey')
 ## Open the modal
 
 ```ts
+client.commands.registerModal(surveyModal)
+
 client.components.register(
   defineButton({
     customId: 'open_v2_modal',

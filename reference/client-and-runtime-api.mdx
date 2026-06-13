@@ -54,6 +54,11 @@ The core lifecycle and event methods are:
 - `requestGuildMembers(...)`
 - `getShardForGuild(guildId)`
 
+Two runtime methods are easy to overlook, but matter in real bots:
+
+- `presence(...)` updates status and activities across shards
+- `requestGuildMembers(...)` asks Discord to send member chunks for large or offline guild member sets
+
 ## Event typing
 
 Chameleon event handlers narrow through the event name and discriminated unions:
@@ -84,6 +89,29 @@ client.use(async (event, next) => {
 
 Use it for logging, profiling, or coarse policy hooks that should apply to many events.
 
+## Presence and member chunking
+
+Presence updates are a client-level concern:
+
+```ts
+client.presence({
+  status: 'online',
+  activities: [{ name: 'Shipping releases', type: 0 }]
+})
+```
+
+For large guilds or member lookup flows, request member chunks explicitly:
+
+```ts
+client.requestGuildMembers({
+  guildId,
+  limit: 0,
+  query: ''
+})
+```
+
+That is the gateway-side tool you reach for when cache hydration depends on Discord sending more member data.
+
 ## Store
 
 `TongueStore` is the shared in-memory cache.
@@ -110,6 +138,12 @@ The client also exposes lower-level infrastructure when you need it:
 - `client.gateways`
 
 Use them when you are extending the framework, building custom tooling, or debugging transport-level issues. Most application code should stay at the manager layer.
+
+## Resolver helpers
+
+The builders layer also exports helper resolvers such as `resolveUser`, `resolveChannel`, `resolveGuild`, and `resolveRole`.
+
+These return a cached entity when present, or a lightweight stub with `id` and a `fetch()` helper when possible. That is useful when you want to pass references around without forcing an immediate REST call.
 
 ## Attached managers
 

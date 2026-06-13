@@ -25,16 +25,6 @@ client.commands.register(ping)
 ## Register a button handler
 
 ```ts
-import { Button } from '@impulsedev/chameleon'
-
-client.components.register(
-  Button.primary('open_modal', 'Open modal')
-)
-```
-
-For execution, attach a handler:
-
-```ts
 import { defineButton } from '@impulsedev/chameleon'
 
 client.components.register(
@@ -47,6 +37,14 @@ client.components.register(
     }
   })
 )
+```
+
+If you only need the visual button definition for a message payload, use `Button.*`:
+
+```ts
+import { Button } from '@impulsedev/chameleon'
+
+const openModalButton = Button.primary('open_modal', 'Open modal')
 ```
 
 ## Send classic V1 components
@@ -68,4 +66,4 @@ await client.messages.send(channelId, {
 
 - Classic message components are row-based because that is how Discord models V1 component payloads.
 - The same `Button.*` helpers also work inside Components V2 accessory flows.
-- Use `defineCommand(...)` and `defineButton(...)` when you want the most explicit, reusable definitions.
+- Use `defineButton(...)` or `Button.of(...)` when the component also needs an `execute` handler.

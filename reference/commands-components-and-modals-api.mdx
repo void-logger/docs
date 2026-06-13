@@ -101,11 +101,18 @@ const survey = modal('survey', 'Survey')
 
 `ctx.fields` is inferred from the modal definition, and uploaded files are exposed through `ctx.attachments[fieldId]`.
 
+Register the modal submit handler through the command manager:
+
+```ts
+client.commands.registerModal(survey)
+```
+
 ## Registration surfaces
 
 There are two different registration paths:
 
-- `client.commands.register(...)` for application commands and modals
+- `client.commands.register(...)` for application commands
+- `client.commands.registerModal(...)` for modal submit handlers
 - `client.components.register(...)` for message components such as buttons and selects
 
 That split reflects Discord’s interaction model rather than trying to collapse unlike things into a single registry.
@@ -118,6 +125,6 @@ If you are writing application code rather than extending the framework internal
 - buttons: `Button.*`
 - classic layouts: `ActionRow.of(...)`
 - V2 layouts: `Container.stack(...)`, `Section.text(...).accessory(...)`
-- modals: `modal(...).add(...).handle(...)`, `field.*`
+- modals: `modal(...).add(...).handle(...)`, `field.*`, `client.commands.registerModal(...)`
 
 These are the highest-value interactive APIs in the current framework surface.
