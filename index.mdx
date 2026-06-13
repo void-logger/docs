@@ -9,9 +9,9 @@ mode: custom
     <div className="ch-home-grid">
       <div className="ch-home-copy">
         <span className="ch-home-badge">Discord API framework</span>
-        <h1>Typed by default. Flat in memory. Close to the Discord API where it matters.</h1>
+        <h1>Type-safe Discord tooling without the usual runtime bloat.</h1>
         <p>
-          Chameleon is a TypeScript framework for Discord bots and automation that prioritizes memory efficiency, explicit REST flows, and ergonomic builders for commands, components, and typed modals.
+          Chameleon is a TypeScript framework for bots and automation built around flat caches, explicit REST results, typed gateway events, and builders that stay close to the real Discord API.
         </p>
         <div className="ch-home-pills">
           <span>POJO-first entities</span>
@@ -22,8 +22,25 @@ mode: custom
       </div>
 
       <aside className="ch-home-panel">
+        <div className="ch-home-stats">
+          <div>
+            <strong>Runtime model</strong>
+            <span>Managers own actions. Entities stay plain and cheap in memory.</span>
+          </div>
+          <div>
+            <strong>Interaction DX</strong>
+            <span>Typed commands, shared buttons, Components V2 helpers, and fluent modals.</span>
+          </div>
+          <div>
+            <strong>Control flow</strong>
+            <span>REST failures come back as values instead of forcing exception-heavy code.</span>
+          </div>
+        </div>
+
+        <div className="ch-home-divider" />
+
         <h2>Start in the right place</h2>
-        <p>Use the docs based on what you are doing right now, not by guessing where framework behavior lives.</p>
+        <p>Use the docs by task, not by guessing which manager or abstraction owns the behavior.</p>
         <a href="/getting-started/quickstart">
           <strong>Boot a client</strong>
           <span>Create a minimal client, subscribe to typed events, and log in.</span>

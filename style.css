@@ -122,27 +122,34 @@ h6 {
 
 .ch-home-grid {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 @media (min-width: 960px) {
   .ch-home-grid {
-    grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 0.95fr);
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1.1fr) minmax(21rem, 0.78fr);
+    align-items: start;
   }
+}
+
+.ch-home-copy {
+  max-width: 43rem;
 }
 
 .ch-home-copy h1 {
   margin-top: 1rem;
-  font-size: clamp(2.6rem, 5vw, 4.4rem);
-  line-height: 0.96;
+  max-width: 11ch;
+  font-size: clamp(2.6rem, 4.8vw, 4.9rem);
+  line-height: 0.92;
+  text-wrap: balance;
 }
 
 .ch-home-copy p {
-  max-width: 42rem;
+  max-width: 36rem;
   margin-top: 1rem;
-  font-size: 1.03rem;
-  line-height: 1.75;
+  font-size: 1rem;
+  line-height: 1.78;
+  opacity: 0.88;
 }
 
 .ch-home-pills {
@@ -174,7 +181,7 @@ h6 {
   align-content: start;
   border: 1px solid rgba(12, 140, 94, 0.14);
   border-radius: 1.25rem;
-  padding: 1.15rem;
+  padding: 1.2rem;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(10px);
 }
@@ -189,6 +196,31 @@ h6 {
 .ch-home-panel h2 {
   margin: 0;
   font-size: 1rem;
+}
+
+.ch-home-stats {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.ch-home-stats>div {
+  border: 1px solid rgba(12, 140, 94, 0.1);
+  border-radius: 1rem;
+  padding: 0.9rem 0.95rem;
+  background: rgba(248, 252, 249, 0.78);
+}
+
+@media (prefers-color-scheme: dark) {
+  .ch-home-stats>div {
+    border-color: rgba(42, 229, 160, 0.1);
+    background: rgba(7, 18, 14, 0.7);
+  }
+}
+
+.ch-home-divider {
+  height: 1px;
+  margin: 0.1rem 0 0.25rem;
+  background: linear-gradient(90deg, rgba(12, 140, 94, 0.22), transparent);
 }
 
 .ch-home-panel p {
@@ -233,13 +265,21 @@ h6 {
   font-size: 0.97rem;
 }
 
-.ch-home-panel span {
+.ch-home-panel span,
+.ch-home-stats span {
   display: block;
   margin-top: 0.3rem;
   font-size: 0.88rem;
   line-height: 1.55;
   color: inherit;
   opacity: 0.78;
+}
+
+.ch-home-stats strong {
+  display: block;
+  font-size: 0.84rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .ch-home-section {
