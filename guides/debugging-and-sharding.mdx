@@ -1,0 +1,46 @@
+---
+title: "Debugging and sharding"
+description: "Use debug logging, understand current sharding support, and know where observability is already useful."
+---
+
+## Debug logging
+
+You can enable framework logging with:
+
+```ts
+const client = new Client({
+  token,
+  intents,
+  debug: true
+})
+```
+
+The goal is readable operational output, not dumping raw gateway payloads directly into the console.
+
+## Sharding
+
+The client supports sharding configuration:
+
+```ts
+const client = new Client({
+  token,
+  intents,
+  sharding: 'auto'
+})
+```
+
+## What to watch while debugging
+
+- invalid modal payloads
+- component custom ID mismatches
+- missing intents
+- REST failures that return `{ ok: false, ... }`
+- event handlers that assume richer runtime objects than the framework actually stores
+
+## Practical advice
+
+When debugging interaction issues:
+
+- inspect the exact component or modal payload sent to Discord
+- inspect `result.raw` for REST failures
+- prefer typed builders over hand-written raw component objects whenever possible

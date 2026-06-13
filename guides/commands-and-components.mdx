@@ -1,0 +1,71 @@
+---
+title: "Commands and components"
+description: "Register slash commands, classic message components, and interaction handlers using the framework’s recommended public APIs."
+---
+
+## Register a command
+
+```ts
+import { defineCommand } from '@impulsedev/chameleon'
+
+const ping = defineCommand({
+  name: 'ping',
+  description: 'Return latency information',
+  execute: async (ctx) => {
+    await ctx.reply({
+      content: `Gateway: ${client.gateway.ms}ms`,
+      ephemeral: true
+    })
+  }
+})
+
+client.commands.register(ping)
+```
+
+## Register a button handler
+
+```ts
+import { Button } from '@impulsedev/chameleon'
+
+client.components.register(
+  Button.primary('open_modal', 'Open modal')
+)
+```
+
+For execution, attach a handler:
+
+```ts
+import { defineButton } from '@impulsedev/chameleon'
+
+client.components.register(
+  defineButton({
+    customId: 'open_modal',
+    style: 'primary',
+    label: 'Open modal',
+    execute: async (ctx) => {
+      await ctx.reply({ content: 'clicked', ephemeral: true })
+    }
+  })
+)
+```
+
+## Send classic V1 components
+
+```ts
+import { ActionRow, Button } from '@impulsedev/chameleon'
+
+await client.messages.send(channelId, {
+  content: 'Classic components',
+  components: [
+    ActionRow.of(
+      Button.primary('open_modal', 'Open modal')
+    )
+  ]
+})
+```
+
+## Notes
+
+- Classic message components are row-based because that is how Discord models V1 component payloads.
+- The same `Button.*` helpers also work inside Components V2 accessory flows.
+- Use `defineCommand(...)` and `defineButton(...)` when you want the most explicit, reusable definitions.

@@ -1,0 +1,43 @@
+---
+title: "Events and middleware"
+description: "Use discriminated union events and the middleware pipeline to shape bot behavior early."
+---
+
+## Event handlers
+
+You subscribe with `client.on(...)` and receive typed event payloads:
+
+```ts
+client.on('MESSAGE_DELETE', (event) => {
+  console.log(event.messageId)
+  console.log(event.message?.content)
+})
+```
+
+## Middleware
+
+`client.use(...)` lets you intercept events before downstream handlers:
+
+```ts
+client.use((event, next) => {
+  if (event.type === 'MESSAGE_CREATE' && event.message.author.bot) return
+  next()
+})
+```
+
+## Why this matters
+
+Middleware is a good fit for:
+
+- dropping bot messages
+- guild allowlists
+- rate limiting or coarse feature gates
+- logging and metrics
+
+## Event typing
+
+The event system is one of Chameleon’s best DX wins:
+
+- the event name narrows the payload shape
+- `event.type` supports further narrowing in shared flows
+- you avoid a lot of nullable probing that is common in untyped gateway payload handling

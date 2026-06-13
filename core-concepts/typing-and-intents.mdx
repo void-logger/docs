@@ -1,0 +1,59 @@
+---
+title: "Typing and intents"
+description: "How commands, modal fields, and event payloads use TypeScript, and where intent-aware typing is already strong or still aspirational."
+---
+
+## Strong areas today
+
+Chameleon already has good type inference in a few places:
+
+- event payload narrowing by event name and `event.type`
+- command option inference through `opt.*`
+- modal field inference through `modal(...).add(...).handle(...)`
+- typed component contexts for many interaction flows
+
+## Slash command options
+
+```ts
+const ping = defineCommand({
+  name: 'ping',
+  description: 'Ping a user',
+  options: {
+    target: opt.user('User to ping', { required: true }),
+    loud: opt.boolean('Whether to ping loudly')
+  },
+  execute: async (ctx) => {
+    const user = ctx.options.target
+    const loud = ctx.options.loud
+
+    await ctx.reply({
+      content: loud ? `PING ${user.id}` : `ping ${user.id}`,
+      ephemeral: true
+    })
+  }
+})
+```
+
+`ctx.options.target` is inferred from the option type, not manually cast.
+
+## Modal fields
+
+```ts
+const profileModal = modal('profile', 'Profile')
+  .add(
+    field.short('name', 'Name'),
+    field.checkbox('accept_rules', 'Accept rules'),
+    field.fileUpload('attachment', 'Attachment', { required: false })
+  )
+  .handle(async (ctx) => {
+    ctx.fields.name
+    ctx.fields.accept_rules
+    ctx.attachments.attachment
+  })
+```
+
+## Intents: design goal vs current reality
+
+The roadmap wants compile-time intent awareness. Conceptually that means using missing intents as a type error, not discovering the problem only at runtime.
+
+The current codebase is directionally aligned with that goal, but it is not fully realized across the entire framework surface yet. Treat this as a design target rather than a solved feature everywhere.

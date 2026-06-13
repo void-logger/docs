@@ -1,0 +1,42 @@
+---
+title: "Store and cache"
+description: "How caching works, what data is stored, and how Chameleon balances memory and convenience."
+---
+
+## Cache philosophy
+
+Chameleon optimizes for lean cached data:
+
+- plain objects instead of class instances
+- IDs instead of eager nested objects where possible
+- shared central stores instead of repeated object graphs
+
+## Practical consequences
+
+When you fetch or receive an entity:
+
+- you usually get a lightweight data object
+- related entities may need to be resolved separately
+- managers are the place for side effects and API calls
+
+## Example
+
+A message stores identifiers like `channelId` and optional `guildId`, instead of embedding fully active relation objects everywhere.
+
+That helps memory use, especially for message-heavy bots.
+
+## When the cache is helpful
+
+The store is useful for:
+
+- reducing repeated entity rebuilds
+- hydrating event payloads
+- quick lookups in interaction and manager flows
+
+## When to fetch again
+
+You should still fetch fresh data when:
+
+- correctness matters more than cache locality
+- you expect the cached object to be stale
+- a relation is not available in store yet

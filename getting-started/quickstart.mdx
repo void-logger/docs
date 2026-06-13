@@ -1,0 +1,54 @@
+---
+title: "Quickstart"
+description: "Create a client, subscribe to typed gateway events, and log in with the smallest useful setup."
+---
+
+## Minimal example
+
+```ts
+import { Client, IntentBits } from '@impulsedev/chameleon'
+
+const client = new Client({
+  token: process.env.DISCORD_TOKEN!,
+  intents: [
+    IntentBits.GUILDS,
+    IntentBits.GUILD_MESSAGES,
+    IntentBits.MESSAGE_CONTENT
+  ],
+  debug: true
+})
+
+client.on('READY', () => {
+  console.log(`Logged in as ${client.user?.username} (${client.user?.id})`)
+})
+
+client.on('MESSAGE_CREATE', (event) => {
+  console.log(`[${event.channel.id}] ${event.message.author.username}: ${event.message.content}`)
+})
+
+client.login()
+```
+
+## Event model
+
+Chameleon uses discriminated union events. In practice, that means each event has a `type`, and TypeScript narrows correctly inside handlers without extra casting.
+
+Example:
+
+```ts
+client.use((event, next) => {
+  if (event.type === 'MESSAGE_CREATE' && event.message.author.bot) return
+  next()
+})
+```
+
+## Notes
+
+- `debug: true` enables framework logging where implemented.
+- `client.user` becomes available after the ready flow completes.
+- Gateway events are modeled as typed payloads, not mutable runtime entity instances.
+- Managers such as `client.messages` and `client.guilds` are the main action surface once the client is running.
+
+## Next step
+
+Read [Architecture](/core-concepts/architecture) next, because Chameleon’s cache and data model differ from the class-heavy patterns many Discord developers expect.

@@ -1,80 +1,87 @@
 ---
-title: "Home"
-description: "Onboarding guides, HR policies, IT help, and department runbooks for the whole company."
+title: "Chameleon"
+description: "A type-safe Discord API framework built around memory efficiency, flat caches, typed events, and low-boilerplate builders."
 mode: custom
 ---
 
-<div className="mx-auto flex w-full max-w-[720px] flex-col gap-12 px-4 py-10 lg:gap-14 lg:py-16">
-  <div className="flex flex-col items-center gap-6">
-    <div className="flex max-w-[480px] flex-col gap-2 text-center">
-      <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-50">
-        Your journey begins here
-      </h1>
-      <p className="text-balance text-base text-gray-600 dark:text-gray-400">
-        This is your go-to reference for how things work here. Use the tabs to navigate to different resources or search with <kbd>⌘</kbd> <kbd>K</kbd>.
-      </p>
+<div className="ch-home mx-auto flex w-full max-w-[1080px] flex-col gap-12 px-4 py-10 lg:gap-14 lg:py-16">
+  <section className="ch-home-hero">
+    <div className="ch-home-grid">
+      <div className="ch-home-copy">
+        <span className="ch-home-badge">Discord API framework</span>
+        <h1>Typed by default. Flat in memory. Close to the Discord API where it matters.</h1>
+        <p>
+          Chameleon is a TypeScript framework for Discord bots and automation that prioritizes memory efficiency, explicit REST flows, and ergonomic builders for commands, components, and typed modals.
+        </p>
+        <div className="ch-home-pills">
+          <span>POJO-first entities</span>
+          <span>Flat cache model</span>
+          <span>Typed gateway events</span>
+          <span>Explicit result objects</span>
+        </div>
+      </div>
+
+      <aside className="ch-home-panel">
+        <h2>Start in the right place</h2>
+        <p>Use the docs based on what you are doing right now, not by guessing where framework behavior lives.</p>
+        <a href="/getting-started/quickstart">
+          <strong>Boot a client</strong>
+          <span>Create a minimal client, subscribe to typed events, and log in.</span>
+        </a>
+        <a href="/getting-started/migrating-from-discordjs">
+          <strong>Migrate from discord.js</strong>
+          <span>Translate entity-method habits into Chameleon’s manager-first model.</span>
+        </a>
+        <a href="/reference/managers-api">
+          <strong>Find the right manager</strong>
+          <span>See where messages, guilds, channels, webhooks, and collectors actually live.</span>
+        </a>
+      </aside>
     </div>
-  </div>
+  </section>
 
-  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-    <a
-      href="/onboarding/first-day"
-      className="group flex flex-col outline-none"
-    >
-      <div
-        className="kb-feature-card relative flex h-[170px] items-center justify-center overflow-hidden rounded-2xl ring-1 ring-gray-100 transition group-hover:ring-gray-200 dark:ring-white/[0.08] dark:group-hover:ring-white/15 saturate-50 group-hover:saturate-100"
-      >
-        <div className="relative flex items-center justify-center">
-          <Icon icon="calendar-1" size={36} className="!bg-white" />
-        </div>
-      </div>
-      <div className="flex flex-col gap-1 pt-4">
-        <span className="text-base font-medium text-gray-900 dark:text-gray-50">Your first day</span>
-        <span className="text-sm leading-5 text-gray-600 dark:text-gray-400">
-          Your first day is all about getting oriented and connecting with key team members.
-        </span>
-      </div>
-    </a>
-
-    <a
-      href="/onboarding/tools/account-access"
-      className="group flex flex-col outline-none"
-    >
-      <div
-        className="kb-feature-card relative flex h-[170px] items-center justify-center overflow-hidden rounded-2xl ring-1 ring-gray-100 transition group-hover:ring-gray-200 dark:ring-white/[0.08] dark:group-hover:ring-white/15 saturate-50 group-hover:saturate-100"
-      >
-        <div className="relative flex items-center justify-center">
-          <Icon icon="key-round" size={36} className="!bg-white" />
-        </div>
-      </div>
-      <div className="flex flex-col gap-1 pt-4">
-        <span className="text-base font-medium text-gray-900 dark:text-gray-50">Account access</span>
-        <span className="text-sm leading-5 text-gray-600 dark:text-gray-400">
-          Which accounts you&apos;ll need, how to claim them, and what to do if anything is missing.
-        </span>
-      </div>
-    </a>
-  </div>
-
-  <div className="flex flex-col gap-4">
-    <h2 className="text-lg font-medium tracking-tight text-gray-900 dark:text-gray-50">Resources</h2>
-
+  <section className="ch-home-section">
+    <h2>Core docs paths</h2>
     <Columns cols={2}>
-      <Card title="HR & People" icon="users" iconType="light" href="/hr-people">
-        Benefits, time off, performance reviews, and compensation.
+      <Card title="Quickstart" icon="rocket" href="/getting-started/quickstart">
+        Boot a client, log in, and react to your first gateway events.
       </Card>
-      <Card title="IT & Security" icon="shield-check" iconType="light" href="/it-security">
-        Access requests, device policy, and security training.
+      <Card title="Architecture" icon="boxes" href="/core-concepts/architecture">
+        Understand the flat store, POJO-first design, and how the framework differs from class-heavy Discord client patterns.
       </Card>
     </Columns>
+  </section>
 
+  <section className="ch-home-section">
     <Columns cols={2}>
-      <Card title="Policies" icon="scroll" iconType="light" href="/policies">
-        Code of conduct, expense reimbursement, travel, and remote work.
+      <Card title="Commands and components" icon="square-terminal" href="/guides/commands-and-components">
+        Register slash commands, buttons, selects, and interaction handlers.
       </Card>
-      <Card title="Engineering" icon="code-xml" iconType="light" href="/engineering">
-        Dev setup, deployment, incident response, and architecture.
+      <Card title="Components v2 and modals" icon="panels-top-left" href="/guides/components-v2-and-modals">
+        Use the newer V2 layout builders, typed modal fields, and upload-aware modal context.
       </Card>
     </Columns>
-  </div>
+  </section>
+
+  <section className="ch-home-section">
+    <Columns cols={2}>
+      <Card title="REST and managers" icon="network" href="/guides/rest-and-managers">
+        Send messages, edit channels, and work against Discord without throwing on every failed request.
+      </Card>
+      <Card title="Migration from discord.js" icon="repeat" href="/getting-started/migrating-from-discordjs">
+        Port an existing bot without treating Chameleon like a drop-in clone of class-heavy frameworks.
+      </Card>
+    </Columns>
+  </section>
+
+  <section className="ch-home-section">
+    <Columns cols={2}>
+      <Card title="Managers API" icon="blocks" href="/reference/managers-api">
+        See which manager owns which operations before you drop down to generated signatures.
+      </Card>
+      <Card title="API reference" icon="book-open-text" href="/reference/api-reference">
+        Use Mintlify for the grouped public surface, then TypeDoc for exact signatures.
+      </Card>
+    </Columns>
+  </section>
 </div>

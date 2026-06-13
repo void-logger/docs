@@ -1,0 +1,60 @@
+---
+title: "Collectors and files"
+description: "Wait for messages or component interactions, and send files from disk or memory."
+---
+
+## Await messages
+
+```ts
+const messages = await client.collectors.awaitMessages(channelId, {
+  max: 2,
+  time: 15_000,
+  filter: (message) => !message.author.bot
+})
+```
+
+The promise resolves with whatever was collected before timeout, not by throwing.
+
+## Await a component click
+
+```ts
+const ctx = await client.collectors.awaitComponent(messageId, {
+  time: 15_000,
+  filter: (ctx) => ctx.customId === 'confirm'
+})
+
+if (!ctx) {
+  console.log('Timed out')
+  return
+}
+
+await ctx.reply({ content: 'Confirmed', ephemeral: true })
+```
+
+## Send files
+
+You can send files from memory:
+
+```ts
+const file = new AttachmentBuilder(
+  Buffer.from('Hello from memory'),
+  { name: 'hello.txt' }
+)
+
+await client.messages.send(channelId, {
+  content: 'Memory file',
+  files: [file]
+})
+```
+
+Or from disk:
+
+```ts
+const file = new AttachmentBuilder('./report.txt')
+```
+
+## Modal uploads
+
+V2 modal upload fields surface submitted files through `ctx.attachments[fieldId]`.
+
+That gives you resolved attachment objects rather than only raw IDs.

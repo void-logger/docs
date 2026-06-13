@@ -1,0 +1,135 @@
+---
+title: "Client and runtime API"
+description: "The top-level runtime objects you instantiate, configure, and use across the whole framework."
+---
+
+## Client
+
+`Client` is the main runtime surface.
+
+It owns:
+
+- token and intent resolution
+- gateway connections and sharding
+- the shared `TongueStore`
+- the `ChameleonREST` instance
+- event subscription
+- middleware
+- all top-level managers
+
+## Constructor shape
+
+```ts
+const client = new Client({
+  token: process.env.DISCORD_TOKEN!,
+  intents: [IntentBits.GUILDS, IntentBits.GUILD_MESSAGES],
+  debug: true,
+  cache: {
+    messages: 1000,
+    guilds: 200
+  }
+})
+```
+
+Important `ClientOptions` fields:
+
+- `token`
+- `intents`
+- `largeThreshold`
+- `sharding`
+- `cache`
+- `debug`
+
+## Runtime methods
+
+The core lifecycle and event methods are:
+
+- `login()`
+- `destroy()`
+- `on(event, listener)`
+- `once(event, listener)`
+- `off(event, listener)`
+- `use(middleware)`
+- `presence(options)`
+- `requestGuildMembers(...)`
+- `getShardForGuild(guildId)`
+
+## Event typing
+
+Chameleon event handlers narrow through the event name and discriminated unions:
+
+```ts
+client.on('MESSAGE_CREATE', (event) => {
+  console.log(event.message.content)
+})
+
+client.on('INTERACTION_CREATE', (event) => {
+  console.log(event.interaction.type)
+})
+```
+
+This is one of the strongest parts of the framework’s public type surface.
+
+## Middleware
+
+Middleware runs between dispatch and listeners:
+
+```ts
+client.use(async (event, next) => {
+  const started = Date.now()
+  await next()
+  console.log(event.type, Date.now() - started)
+})
+```
+
+Use it for logging, profiling, or coarse policy hooks that should apply to many events.
+
+## Store
+
+`TongueStore` is the shared in-memory cache.
+
+It keeps flatter entity collections instead of nested object graphs:
+
+- `guilds`
+- `channels`
+- `messages`
+- `users`
+- `members`
+- `roles`
+- `emojis`
+- `stickers`
+
+Tune the store through `ClientOptions.cache` when memory shape matters.
+
+## REST and gateway objects
+
+The client also exposes lower-level infrastructure when you need it:
+
+- `client.rest`
+- `client.gateway`
+- `client.gateways`
+
+Use them when you are extending the framework, building custom tooling, or debugging transport-level issues. Most application code should stay at the manager layer.
+
+## Attached managers
+
+The main manager properties are:
+
+- `commands`
+- `components`
+- `users`
+- `guilds`
+- `channels`
+- `messages`
+- `collectors`
+- `webhooks`
+- `invites`
+- `autoMod`
+- `scheduledEvents`
+- `entitlements`
+- `stageInstances`
+- `templates`
+- `application`
+- `soundboard`
+
+Each manager keeps a focused responsibility. The client is the composition root, not a giant action bag.

@@ -1,0 +1,187 @@
+---
+title: "Migrating from discord.js"
+description: "Translate the mental model of a discord.js bot into Chameleon without fighting the framework."
+---
+
+## Start with the mental shift
+
+Chameleon is not trying to be `discord.js` with different method names.
+
+The biggest differences are architectural:
+
+- cached entities are plain objects, not active class instances
+- actions live on managers such as `client.messages` or `client.guilds`
+- many APIs return explicit result objects instead of throwing on normal HTTP failures
+- event typing is based on discriminated unions, not wide generic emitter overloads
+- the cache is flatter and less graph-shaped
+
+If you treat Chameleon like a thin wrapper around raw Discord data plus typed helpers, the API starts to feel coherent very quickly.
+
+## Client bootstrapping
+
+`discord.js`:
+
+```ts
+import { Client, GatewayIntentBits } from 'discord.js'
+
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
+})
+```
+
+Chameleon:
+
+```ts
+import { Client, IntentBits } from '@impulsedev/chameleon'
+
+const client = new Client({
+  token: process.env.DISCORD_TOKEN!,
+  intents: [IntentBits.GUILDS, IntentBits.GUILD_MESSAGES]
+})
+```
+
+The practical difference is that the token is part of the client constructor, and the client exposes managers directly after construction.
+
+## Entities are data, not behavior
+
+`discord.js` often encourages this style:
+
+```ts
+const message = await channel.messages.fetch(messageId)
+await message.reply('pong')
+```
+
+In Chameleon, you usually work through managers:
+
+```ts
+const message = await client.messages.fetch(channelId, messageId)
+
+if (!message.ok) {
+  console.error(message.error)
+  return
+}
+
+await client.messages.send(channelId, {
+  content: 'pong',
+  reply: { messageId }
+})
+```
+
+That is intentional. A cached `Message` is a value object. The manager owns the action surface.
+
+## Cache access is flatter
+
+Instead of traversing deep trees like:
+
+```ts
+guild.channels.cache.get(channelId)
+guild.members.cache.get(userId)
+```
+
+Chameleon keeps a flatter store:
+
+```ts
+client.cache.channels.get(channelId)
+client.cache.members.get(`${guildId}:${userId}`)
+```
+
+In practice, you often do not touch the store directly unless you are optimizing or building custom flows. The normal path is still the corresponding manager.
+
+## REST failures are values
+
+One of the biggest flow changes is error handling.
+
+`discord.js` often pushes you toward `try/catch` around REST calls. Chameleon returns a result object:
+
+```ts
+const result = await client.guilds.fetch(guildId)
+
+if (!result.ok) {
+  console.error(result.status, result.error)
+  return
+}
+
+console.log(result.data.name)
+```
+
+That means:
+
+- expected API failures are explicit
+- branching is local and predictable
+- scripts and jobs can avoid exception-heavy control flow
+
+## Commands are definition-first
+
+Instead of subclassing command structures or stitching builders together ad hoc, Chameleon leans on definition helpers:
+
+```ts
+const ping = defineCommand({
+  name: 'ping',
+  description: 'Check latency',
+  execute: async (ctx) => {
+    await ctx.reply({ content: 'pong' })
+  }
+})
+
+client.commands.register(ping)
+```
+
+For slash command options, `ctx.options` is inferred from the option builders you use.
+
+## Components and modals are more typed than they look
+
+Chameleon has two component styles:
+
+- classic message components through `ActionRow`
+- Components V2 layout through `Container` and `Section`
+
+Modals now have a fluent builder with typed field inference:
+
+```ts
+const surveyModal = modal('survey', 'Survey')
+  .add(
+    field.short('name', 'Your name'),
+    field.checkbox('accept', 'Accept rules')
+  )
+  .handle(async (ctx) => {
+    await ctx.reply({
+      content: `name=${ctx.fields.name}, accept=${ctx.fields.accept}`,
+      ephemeral: true
+    })
+  })
+```
+
+That is a different style from `discord.js`, but it removes a lot of manual parsing.
+
+## Map of common translations
+
+| discord.js habit | Chameleon equivalent |
+| --- | --- |
+| `client.on('messageCreate', ...)` | `client.on('MESSAGE_CREATE', ...)` |
+| rich entity instance methods | manager methods on `client.*` |
+| `try/catch` around many REST calls | check `result.ok` |
+| nested cache trees | flat store plus manager fetches |
+| builder-heavy modal parsing by hand | `modal(...).add(...).handle(...)` with `ctx.fields` |
+
+## Migration strategy that usually works
+
+If you have an existing bot, avoid a big-bang rewrite.
+
+Move in this order:
+
+1. Port client bootstrapping and intents.
+2. Port event handlers and replace entity-instance methods with managers.
+3. Replace command registration with `defineCommand(...)`.
+4. Replace component and modal flows with the Chameleon builders.
+5. Only then revisit caching assumptions and optimize store access.
+
+This keeps the migration about control flow first, not micro-DX details.
+
+## What tends to surprise people
+
+- You will write `client.messages.send(...)` more often than `message.reply(...)`.
+- IDs matter more because relations are less object-graph-driven.
+- Some surfaces are already polished, especially typed modals and newer V2 builders.
+- Some lower-level APIs still feel closer to Discord than to a fully abstracted ORM-style framework.
+
+That tradeoff is deliberate. Chameleon is optimizing for explicitness and memory shape, not maximal concealment of the Discord API.

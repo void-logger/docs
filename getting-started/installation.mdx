@@ -1,0 +1,45 @@
+---
+title: "Installation"
+description: "Install Chameleon, understand the package format, and prepare a TypeScript project for development."
+---
+
+## Requirements
+
+- Node.js with ESM support
+- TypeScript
+- A Discord bot token
+
+## Install
+
+```bash
+npm install @impulsedev/chameleon
+```
+
+Chameleon publishes:
+
+- ESM runtime at `dist/index.js`
+- Type declarations at `dist/index.d.ts`
+
+## Project assumptions
+
+The package itself is ESM-first. If you are using TypeScript, make sure your project is configured for ESM-compatible output and resolution.
+
+Typical expectations:
+
+- `"type": "module"` in `package.json`
+- modern TypeScript module resolution
+- import syntax instead of `require(...)`
+
+## Development scripts in this repo
+
+If you are working inside the Chameleon repository itself, useful scripts are:
+
+```bash
+npm run typecheck
+npm run build
+npm run test
+```
+
+## Next step
+
+Continue with [Quickstart](/getting-started/quickstart) to boot a client and subscribe to your first events.

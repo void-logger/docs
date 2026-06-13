@@ -1,152 +1,118 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "sequoia",
-  "name": "Knowledge base",
-  "description": "Onboarding, employee handbook, HR guides, IT help, company policies, and department runbooks.",
+  "name": "Chameleon",
+  "description": "Documentation for the Chameleon Discord API framework.",
   "colors": {
-    "primary": "#166E3F",
-    "light": "#26BD6C",
-    "dark": "#166E3F"
+    "primary": "#0C8C5E",
+    "light": "#2AE5A0",
+    "dark": "#0E6B49"
+  },
+  "appearance": {
+    "default": "system"
   },
   "favicon": "/favicon.ico",
+  "background": {
+    "decoration": "grid",
+    "color": {
+      "light": "#F7FBF8",
+      "dark": "#08130F"
+    }
+  },
+  "fonts": {
+    "body": {
+      "family": "Manrope",
+      "weight": 500
+    },
+    "heading": {
+      "family": "Sora",
+      "weight": 700
+    }
+  },
   "icons": {
     "library": "lucide"
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs",
+    "codeblocks": {
+      "theme": {
+        "light": "github-light",
+        "dark": "github-dark"
+      }
+    }
   },
   "metadata": {
     "timestamp": true
   },
   "contextual": {
-    "options": ["copy", "view", "assistant", "mcp", "add-mcp"]
+    "options": ["copy", "view", "assistant"]
   },
   "navigation": {
     "tabs": [
       {
-        "tab": "Onboarding",
+        "tab": "Getting started",
         "groups": [
           {
-            "group": "Welcome",
-            "pages": ["index"]
-          },
-          {
-            "group": "Your first days",
+            "group": "Introduction",
             "pages": [
-              "onboarding/first-day",
-              "onboarding/first-week",
-              "onboarding/meet-the-team"
-            ]
-          },
-          {
-            "group": "Tools & access",
-            "pages": [
-              "onboarding/tools/laptop-setup",
-              "onboarding/tools/account-access",
-              "onboarding/tools/vpn-setup"
+              "index",
+              "getting-started/overview",
+              "getting-started/installation",
+              "getting-started/quickstart",
+              "getting-started/client-setup",
+              "getting-started/migrating-from-discordjs"
             ]
           }
         ]
       },
       {
-        "tab": "HR & People",
+        "tab": "Core concepts",
         "groups": [
           {
-            "group": "Overview",
-            "pages": ["hr-people/index"]
-          },
-          {
-            "group": "Benefits & time off",
+            "group": "Framework model",
             "pages": [
-              "hr-people/benefits",
-              "hr-people/time-off"
-            ]
-          },
-          {
-            "group": "Growth & pay",
-            "pages": [
-              "hr-people/performance-reviews",
-              "hr-people/compensation/index",
-              "hr-people/compensation/salary-bands",
-              "hr-people/compensation/equity-overview"
+              "core-concepts/architecture",
+              "core-concepts/store-and-cache",
+              "core-concepts/events-and-middleware",
+              "core-concepts/rest-result-shape",
+              "core-concepts/typing-and-intents"
             ]
           }
         ]
       },
       {
-        "tab": "IT & Security",
+        "tab": "Guides",
         "groups": [
           {
-            "group": "Overview",
-            "pages": ["it-security/index"]
-          },
-          {
-            "group": "Access & devices",
+            "group": "Bot flows",
             "pages": [
-              "it-security/access-requests",
-              "it-security/device-policy"
-            ]
-          },
-          {
-            "group": "Security training",
-            "pages": [
-              "it-security/security-training/index",
-              "it-security/security-training/phishing",
-              "it-security/security-training/data-handling"
+              "guides/slash-commands",
+              "guides/commands-and-components",
+              "guides/components-v2-and-modals",
+              "guides/collectors-and-files",
+              "guides/rest-and-managers",
+              "guides/message-and-channel-managers",
+              "guides/guilds-members-and-roles",
+              "guides/webhooks-invites-and-application-flows",
+              "guides/debugging-and-sharding",
+              "guides/store-tuning"
             ]
           }
         ]
       },
       {
-        "tab": "Policies",
+        "tab": "Reference",
         "groups": [
           {
-            "group": "Overview",
-            "pages": ["policies/index"]
-          },
-          {
-            "group": "Conduct & spend",
+            "group": "Reference",
             "pages": [
-              "policies/code-of-conduct",
-              "policies/expense-reimbursement",
-              "policies/travel-policy"
-            ]
-          },
-          {
-            "group": "Remote work",
-            "pages": [
-              "policies/remote-work/index",
-              "policies/remote-work/home-office-setup",
-              "policies/remote-work/time-zones"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Engineering",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": ["engineering/index"]
-          },
-          {
-            "group": "Setup & deployment",
-            "pages": [
-              "engineering/dev-setup",
-              "engineering/deployment"
-            ]
-          },
-          {
-            "group": "Incident response",
-            "pages": [
-              "engineering/incident-response/index",
-              "engineering/incident-response/on-call",
-              "engineering/incident-response/postmortem"
-            ]
-          },
-          {
-            "group": "Architecture",
-            "pages": [
-              "engineering/architecture/index",
-              "engineering/architecture/services-overview",
-              "engineering/architecture/data-models"
+              "reference/client-and-runtime-api",
+              "reference/commands-components-and-modals-api",
+              "reference/managers-api",
+              "reference/api-reference",
+              "reference/roadmap-and-design",
+              "reference/public-surface",
+              "reference/current-limitations"
             ]
           }
         ]
@@ -155,25 +121,34 @@
   },
   "logo": {
     "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "dark": "/logo/dark.svg",
+    "href": "https://github.com/ImpulseDoes/chameleon"
   },
   "navbar": {
     "links": [
       {
-        "label": "Submit IT ticket",
-        "href": "/it-security/access-requests"
+        "label": "Quickstart",
+        "href": "/getting-started/quickstart"
+      },
+      {
+        "label": "Guides",
+        "href": "/guides/rest-and-managers"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/ImpulseDoes/chameleon"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Employee portal",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Start building",
+      "href": "/getting-started/quickstart"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/yourcompany",
-      "linkedin": "https://linkedin.com/company/yourcompany"
+      "x": "https://x.com/impulsedoes",
+      "github": "https://github.com/ImpulseDoes/chameleon"
     }
   }
 }

@@ -1,0 +1,134 @@
+---
+title: "Guilds, members, and roles"
+description: "Work with guild-level data, moderation actions, nested role and member managers, and audit-log-aware write operations."
+---
+
+## Guild manager
+
+`client.guilds` is the top-level manager for guild-scoped resources.
+
+It covers:
+
+- `fetch`
+- `edit`
+- `delete`
+- `fetchChannels`
+- moderation helpers such as `ban`, `unban`, and `kick`
+- emojis and stickers
+- bans and invites
+- nested role and member managers
+
+## Member and role managers are guild-scoped
+
+Instead of using one global manager with a `guildId` argument everywhere, Chameleon exposes scoped helpers:
+
+```ts
+const members = client.guilds.members(guildId)
+const roles = client.guilds.roles(guildId)
+```
+
+That usually reads better in real bot code and reduces repeated parameter noise.
+
+## Fetch and edit a guild
+
+```ts
+const guild = await client.guilds.fetch(guildId)
+
+if (!guild.ok) {
+  console.error(guild.error)
+  return
+}
+
+await client.guilds.edit(guildId, {
+  description: 'Internal automation server'
+}, 'Update guild description')
+```
+
+As with other managers, successful writes update the cache when the manager owns that cache entry.
+
+## Moderation operations
+
+```ts
+await client.guilds.ban(guildId, userId, {
+  deleteMessageSeconds: 300,
+  reason: 'Spam link wave'
+})
+
+await client.guilds.unban(guildId, userId, 'Appeal accepted')
+await client.guilds.kick(guildId, userId, 'Removed inactive alt')
+```
+
+These methods return explicit result objects, so moderation flows can branch without exceptions.
+
+## Member operations
+
+```ts
+const members = client.guilds.members(guildId)
+
+const member = await members.fetch(userId)
+if (!member.ok) return
+
+await members.edit(userId, {
+  nick: 'release-bot'
+})
+
+await members.addRole(userId, roleId)
+await members.removeRole(userId, roleId)
+await members.timeout(userId, Date.now() + 60_000, 'Cooldown')
+```
+
+`timeout` accepts a `Date`, Unix millisecond timestamp, or `null` to clear the timeout.
+
+## Search and list members
+
+```ts
+const listed = await members.list({ limit: 1000 })
+const matches = await members.search('impulse', 10)
+```
+
+This is often a better fit than assuming the full member list is already hot in cache.
+
+## Role operations
+
+```ts
+const roles = client.guilds.roles(guildId)
+
+const created = await roles.create({
+  name: 'Release manager',
+  color: 0x57f287
+}, 'Create release role')
+
+if (created.ok) {
+  await roles.edit(created.data.id, {
+    hoist: true
+  })
+}
+```
+
+Use the nested role manager whenever the operation is inherently guild-scoped.
+
+## Emojis and stickers
+
+`client.guilds` also centralizes custom expression management:
+
+- `listEmojis`
+- `fetchEmoji`
+- `createEmoji`
+- `editEmoji`
+- `deleteEmoji`
+- `listStickers`
+- `fetchSticker`
+
+That makes the guild manager the right entry point for most customization tooling.
+
+## Cache note for members
+
+Member cache keys are composite. Internally, the store uses a guild-and-user key shape, not just `userId`.
+
+That means:
+
+- a member is not globally unique by user ID alone
+- cross-guild code should always carry the guild ID explicitly
+- using `client.guilds.members(guildId)` is safer than hand-rolling cache lookups
+
+That design avoids collisions and matches Discord’s actual data model better than pretending members are standalone global entities.

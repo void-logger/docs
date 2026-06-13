@@ -1,0 +1,192 @@
+---
+title: "Message and channel managers"
+description: "Use the most common runtime managers for sending messages, editing channels, threads, reactions, files, and Components V2 payloads."
+---
+
+## Message manager
+
+`client.messages` is the workhorse manager for most bots.
+
+It covers:
+
+- `fetch`
+- `send`
+- `edit`
+- `delete`
+- `list`
+- reactions and pins
+- file uploads
+- component payloads
+- poll payloads
+
+## Send a message
+
+```ts
+const result = await client.messages.send(channelId, {
+  content: 'Deployment finished',
+  tts: false
+})
+
+if (!result.ok) {
+  console.error(result.status, result.error)
+  return
+}
+
+console.log(result.data.id)
+```
+
+If you only need plain text, a string works too:
+
+```ts
+await client.messages.send(channelId, 'pong!')
+```
+
+## Reply to a message
+
+```ts
+await client.messages.send(channelId, {
+  content: 'I saw that',
+  reply: {
+    messageId,
+    failIfNotExists: true
+  }
+})
+```
+
+That is the Chameleon equivalent of a reply helper on the message instance.
+
+## Edit and delete
+
+```ts
+const edited = await client.messages.edit(channelId, messageId, {
+  content: 'Updated content'
+})
+
+if (!edited.ok) {
+  console.error(edited.error)
+}
+
+await client.messages.delete(channelId, messageId)
+```
+
+`edit` and `delete` both update the local message cache when the operation succeeds.
+
+## Send files
+
+```ts
+import { AttachmentBuilder } from '@impulsedev/chameleon'
+
+await client.messages.send(channelId, {
+  content: 'Build log attached',
+  files: [
+    new AttachmentBuilder('./dist/report.txt', {
+      name: 'report.txt'
+    })
+  ]
+})
+```
+
+Use `AttachmentBuilder` when you need to upload from disk or from an in-memory buffer.
+
+## Send Components V2 layouts
+
+```ts
+await client.messages.send(channelId, {
+  flags: MESSAGE_FLAGS.IS_COMPONENTS_V2,
+  components: [
+    Container.stack(
+      Section.text('Open the survey flow')
+        .accessory(Button.primary('open_survey', 'Open survey'))
+    )
+  ]
+})
+```
+
+`flags: MESSAGE_FLAGS.IS_COMPONENTS_V2` is what tells Discord to interpret the message as a V2 layout payload.
+
+## Channel manager
+
+`client.channels` owns channel-level operations:
+
+- `fetch`
+- `create`
+- `edit`
+- `delete`
+- `clone`
+- `setPositions`
+- permission overwrites
+- invites
+- announcement following
+- thread creation and membership
+
+## Create or edit a channel
+
+```ts
+const created = await client.channels.create(guildId, {
+  name: 'deployments',
+  type: 0,
+  topic: 'Deployment notifications'
+}, 'Create deployment feed')
+
+if (!created.ok) {
+  console.error(created.error)
+  return
+}
+
+await client.channels.edit(created.data.id, {
+  topic: 'Deployment notifications and rollback notes'
+})
+```
+
+When a manager accepts `reason`, Chameleon forwards it as the audit log reason header.
+
+## Clone a cached channel
+
+```ts
+const result = await client.channels.clone(channelId, {
+  name: 'deployments-copy'
+})
+```
+
+`clone` depends on the source channel already being in cache. If it is not cached, fetch it first.
+
+## Create threads
+
+```ts
+await client.channels.createThread(channelId, {
+  name: 'release-2026-06-13',
+  autoArchiveDuration: 1440
+})
+
+await client.channels.createThreadFromMessage(channelId, messageId, {
+  name: 'follow-up discussion'
+})
+```
+
+The same manager also exposes `joinThread`, `leaveThread`, `listActiveThreads`, and `listArchivedThreads`.
+
+## Typing, invites, and followers
+
+```ts
+await client.channels.sendTyping(channelId)
+
+await client.channels.createInvite(channelId, {
+  maxAge: 3600,
+  maxUses: 10
+})
+
+await client.channels.followAnnouncementChannel(sourceChannelId, targetChannelId)
+```
+
+This is useful for operational bots that automate guild configuration or notification fanout.
+
+## Recommended pattern
+
+For runtime code, keep a simple split:
+
+- use `client.messages` for message lifecycle
+- use `client.channels` for structure and thread operations
+- use components and modal builders for interaction payloads
+- check `result.ok` at the edge of each async operation
+
+That keeps the rest of your bot code plain and unsurprising.

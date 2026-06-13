@@ -1,0 +1,44 @@
+---
+title: "REST result shape"
+description: "Understand the explicit success and failure model used across managers and the standalone REST client."
+---
+
+## Success and failure shape
+
+Chameleon’s REST-style flows generally return:
+
+```ts
+type ChameleonAPIResult<T> =
+  | { ok: true, data: T }
+  | { ok: false, error: string, message: string, status: number, code?: number, raw?: unknown }
+```
+
+## Why this exists
+
+The framework prefers explicit branching over exception-driven control flow:
+
+- success stays local to `result.data`
+- failure carries HTTP status and API details
+- raw error payloads can still be inspected when needed
+- scripts and service-style processes can stay predictable without `try/catch` around every request
+
+## Example
+
+```ts
+const result = await client.channels.fetch(channelId)
+
+if (!result.ok) {
+  console.error(result.error)
+  console.error(result.status)
+  console.error(result.raw)
+  return
+}
+
+console.log(result.data.name)
+```
+
+## When the framework still throws
+
+Some higher-level interaction helpers can still throw when Discord rejects an already-constructed payload, especially in acknowledgement paths such as `showModal(...)`.
+
+That is usually a payload-construction problem, not a contradiction of the result model. Manager and REST flows still follow `ChameleonAPIResult<T>`; direct interaction acknowledgement helpers may need to throw immediately because Discord accepts only one response path for that interaction.

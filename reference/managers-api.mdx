@@ -1,0 +1,125 @@
+---
+title: "Managers API"
+description: "A grouped map of the manager surface, including which managers cache entities, which are guild-scoped, and which are mostly transport wrappers."
+---
+
+## Cache-backed entity managers
+
+These managers build entities and usually hydrate `TongueStore` on successful reads and writes:
+
+- `UserManager`
+- `GuildManager`
+- `ChannelManager`
+- `MessageManager`
+- `RoleManager`
+- `AutoModerationManager`
+- `ScheduledEventManager`
+- `EntitlementManager`
+- `StageInstanceManager`
+
+Most of them follow the familiar pattern inherited from `BaseManager`:
+
+- `fetch(id, force?)`
+- cache-first read when `force` is `false`
+- build the entity
+- update the relevant store collection
+
+## Guild-scoped nested managers
+
+Some managers are obtained from `client.guilds` rather than from the client root:
+
+- `client.guilds.members(guildId)`
+- `client.guilds.roles(guildId)`
+
+These managers keep the guild ID scoped into the instance. That simplifies signatures and matches Discord’s actual resource model.
+
+## High-traffic managers
+
+The managers most bots will touch constantly are:
+
+### `MessageManager`
+
+Use for:
+
+- sends and edits
+- replies
+- deletes
+- pins
+- reactions
+- history listing
+- component and file payloads
+
+### `ChannelManager`
+
+Use for:
+
+- channel CRUD
+- permission overwrites
+- typing
+- invites
+- thread creation and membership
+- announcement following
+
+### `GuildManager`
+
+Use for:
+
+- guild fetch and edit
+- moderation actions
+- channel listing
+- emoji and sticker management
+- nested members and roles
+
+## Utility and orchestration managers
+
+These managers are less about cached entities and more about orchestrating common workflows:
+
+### `CollectorManager`
+
+Use for:
+
+- `awaitMessages(channelId, options)`
+- `awaitComponent(messageId, options)`
+
+It is event-driven utility code, not a CRUD manager.
+
+### `InviteManager`
+
+Focused, route-level surface:
+
+- `fetch`
+- `delete`
+
+### `WebhookManager`
+
+Use for:
+
+- webhook CRUD
+- executing webhook messages
+- optional `wait` mode for receiving the created message back
+
+## Specialized platform managers
+
+These managers cover narrower Discord product areas:
+
+- `ApplicationManager`
+- `TemplateManager`
+- `SoundboardManager`
+- `AutoModerationManager`
+- `ScheduledEventManager`
+- `EntitlementManager`
+- `StageInstanceManager`
+
+You usually reach for them when building admin tooling, platform integrations, or monetization-aware flows rather than a simple command bot.
+
+## Choosing the right manager
+
+Use this rule of thumb:
+
+- if the operation is about message lifecycle, start at `client.messages`
+- if it changes guild structure, start at `client.channels` or `client.guilds`
+- if it targets a guild member or role, scope through `client.guilds`
+- if it is interaction timing logic, use `client.collectors`
+- if it is transport-only delivery, `client.webhooks` may be better than a gateway-driven path
+
+That keeps your application code aligned with the framework’s actual design instead of fighting it.

@@ -1,0 +1,66 @@
+---
+title: "Slash commands"
+description: "Define commands, option schemas, and subcommands with typed contexts."
+---
+
+## Basic command
+
+```ts
+import { defineCommand, opt } from '@impulsedev/chameleon'
+
+const echo = defineCommand({
+  name: 'echo',
+  description: 'Echo text back',
+  options: {
+    text: opt.string('Text to send back', { required: true })
+  },
+  execute: async (ctx) => {
+    await ctx.reply({
+      content: ctx.options.text,
+      ephemeral: true
+    })
+  }
+})
+```
+
+## Register it
+
+```ts
+client.commands.register(echo)
+```
+
+## Subcommands
+
+```ts
+const admin = defineCommand({
+  name: 'admin',
+  description: 'Admin tools',
+  subcommands: {
+    ban: defineSubcommand({
+      description: 'Ban a member',
+      options: {
+        target: opt.user('User to ban', { required: true }),
+        reason: opt.string('Reason')
+      },
+      execute: async (ctx) => {
+        const target = ctx.options.target
+        const reason = ctx.options.reason
+        await ctx.reply(`Would ban ${target.id} for ${reason ?? 'no reason'}`)
+      }
+    })
+  }
+})
+```
+
+## Important behavior
+
+`defineCommand(...)` will throw if you create a command with neither:
+
+- `execute`
+- nor any subcommands
+
+That catches one class of invalid command definitions early.
+
+## Deployment note
+
+The command manager deploys registered commands through the application command API. If the client is already ready, deployment happens immediately. Otherwise it is deferred until the ready flow completes.

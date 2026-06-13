@@ -1,0 +1,126 @@
+---
+title: "Webhooks, invites, and application flows"
+description: "Use the less day-to-day managers for incoming content delivery, invite handling, and application metadata endpoints."
+---
+
+## When these managers matter
+
+Many bots spend most of their time in messages, channels, guilds, and interactions.
+
+The rest of the manager surface becomes important when you are building:
+
+- deployment and logging pipelines
+- webhook-driven integrations
+- invite analytics or automation
+- application metadata features
+- operational tooling around templates, entitlements, or scheduled events
+
+## Webhooks
+
+`client.webhooks` covers:
+
+- `fetch`
+- `fetchByChannel`
+- `fetchByGuild`
+- `create`
+- `edit`
+- `delete`
+- `execute`
+
+## Execute a webhook
+
+```ts
+const result = await client.webhooks.execute(webhookId, webhookToken, {
+  content: 'Nightly build completed'
+}, { wait: true })
+
+if (!result.ok) {
+  console.error(result.status, result.error)
+  return
+}
+
+console.log(result.data?.id)
+```
+
+When `wait: true` is enabled, Discord returns the created message and Chameleon builds it into a cached `Message`.
+
+## Execute with files or components
+
+Webhook execution supports the same broad payload patterns as normal message sends:
+
+- embeds
+- components
+- polls
+- file uploads
+
+That makes webhooks a practical delivery path for CI, dashboards, and external systems that should not depend on a gateway session.
+
+## Invites
+
+`client.invites` is intentionally small and focused:
+
+- `fetch`
+- `delete`
+
+```ts
+const invite = await client.invites.fetch('abc123', {
+  withCounts: true,
+  withExpiration: true
+})
+
+if (invite.ok) {
+  console.log(invite.data.code)
+}
+```
+
+If you need channel-scoped invite creation, use `client.channels.createInvite(...)`.
+
+## Application manager
+
+`client.application` is useful when you need metadata about the current bot application rather than guild content.
+
+It currently covers:
+
+- `fetch`
+- `fetchRoleConnectionMetadata`
+- `editRoleConnectionMetadata`
+
+```ts
+const app = await client.application.fetch()
+
+if (!app.ok) {
+  console.error(app.error)
+  return
+}
+
+console.log(app.data.id, app.data.name)
+```
+
+Role connection metadata methods require the client user to be ready, because the application ID is resolved from the current session.
+
+## Other specialized managers
+
+Chameleon also exports managers for narrower Discord surfaces:
+
+- `client.autoMod`
+- `client.scheduledEvents`
+- `client.entitlements`
+- `client.stageInstances`
+- `client.templates`
+- `client.soundboard`
+
+These are intentionally not the first stop in the docs because most bots do not need them on day one. They still follow the same core rules:
+
+- typed result objects
+- manager-owned REST operations
+- cache updates where relevant
+
+## Recommended usage pattern
+
+If your bot grows into multiple processes or services, a useful split is:
+
+- gateway client for interactions and live events
+- REST-leaning utilities for webhooks, templates, and metadata tasks
+- shared application code that only depends on the explicit result shape
+
+That fits Chameleon well because the framework does not assume the gateway must be the center of every workflow.

@@ -1,0 +1,72 @@
+---
+title: "Components v2 and modals"
+description: "Build V2 layouts and typed modal flows with the newer fluent helpers."
+---
+
+## V2 message layout
+
+```ts
+await client.messages.send(channelId, {
+  flags: MESSAGE_FLAGS.IS_COMPONENTS_V2,
+  components: [
+    Container.stack(
+      Section.text('Open the survey modal')
+        .accessory(Button.primary('open_v2_modal', 'Open modal')),
+      Section.text('Open the upload modal')
+        .accessory(Button.secondary('open_v2_upload_modal', 'Upload file'))
+    )
+  ]
+})
+```
+
+## Typed modal definition
+
+```ts
+const surveyModal = modal('survey_modal', 'Survey')
+  .add(
+    field.short('name', 'Your name'),
+    field.radioGroup('color', 'Favorite color', {
+      options: [
+        { label: 'Red', value: 'red' },
+        { label: 'Blue', value: 'blue' }
+      ]
+    }),
+    field.fileUpload('attachment', 'Upload a file', { required: false })
+  )
+  .handle(async (ctx) => {
+    const name = ctx.fields.name
+    const color = ctx.fields.color
+    const files = ctx.attachments.attachment ?? []
+
+    await ctx.reply({
+      content: `name=${name}, color=${color}, files=${files.length}`,
+      ephemeral: true
+    })
+  })
+```
+
+## Open the modal
+
+```ts
+client.components.register(
+  defineButton({
+    customId: 'open_v2_modal',
+    style: 'primary',
+    label: 'Open modal',
+    execute: async (ctx) => {
+      await ctx.showModal(surveyModal)
+    }
+  })
+)
+```
+
+## What improved recently
+
+- One `Button` helper works in both V1 rows and V2 accessories.
+- `Section.text(...).accessory(...)` avoids positional accessory arguments.
+- `modal(...).add(...).handle(...)` keeps `ctx.fields` inferred.
+- Upload fields surface resolved files through `ctx.attachments[fieldId]`.
+
+## Current limitation
+
+Components V2 are much better than before, but the layout DSL is still more structural than ideal. The framework is moving toward fewer raw payload shapes, not zero internal structure everywhere yet.

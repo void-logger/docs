@@ -1,0 +1,123 @@
+---
+title: "Commands, components, and modals API"
+description: "A practical reference for the interactive surfaces: slash commands, classic components, Components V2, and typed modals."
+---
+
+## Commands
+
+The command API is centered on definitions, not subclasses.
+
+Primary exports:
+
+- `defineCommand`
+- `defineSubcommand`
+- `opt.*`
+- `CommandContext`
+- `CommandManager`
+
+Typical flow:
+
+```ts
+const ping = defineCommand({
+  name: 'ping',
+  description: 'Health check',
+  execute: async (ctx) => {
+    await ctx.reply({ content: 'pong' })
+  }
+})
+
+client.commands.register(ping)
+```
+
+Option builders infer `ctx.options` based on the definition.
+
+## Classic message components
+
+For V1-style component rows, the important exports are:
+
+- `defineButton`
+- `Button.*`
+- `ActionRow`
+- `defineStringSelect`
+- other select definitions
+- `ComponentContext`
+
+Example:
+
+```ts
+ActionRow.of(
+  Button.primary('confirm', 'Confirm'),
+  Button.secondary('cancel', 'Cancel')
+)
+```
+
+The same `Button` helper now works in both classic rows and V2 accessories.
+
+## Components V2
+
+For V2 layouts, the main exports are:
+
+- `Container`
+- `Section`
+- `TextDisplay`
+- `Thumbnail`
+- `Separator`
+- `Label`
+
+The newer fluent helpers are the recommended entry point:
+
+```ts
+Container.stack(
+  Section.text('Open setup')
+    .accessory(Button.primary('open_setup', 'Open'))
+)
+```
+
+Use V2 when you want richer Discord-native layout composition instead of flat action rows.
+
+## Modals
+
+The recommended modal exports are:
+
+- `modal(customId, title)`
+- `field.short`
+- `field.paragraph`
+- `field.checkbox`
+- `field.radioGroup`
+- `field.checkboxGroup`
+- `field.fileUpload`
+- `ModalContext`
+
+```ts
+const survey = modal('survey', 'Survey')
+  .add(
+    field.short('name', 'Your name'),
+    field.checkbox('accept', 'Accept rules')
+  )
+  .handle(async (ctx) => {
+    console.log(ctx.fields.name, ctx.fields.accept)
+  })
+```
+
+`ctx.fields` is inferred from the modal definition, and uploaded files are exposed through `ctx.attachments[fieldId]`.
+
+## Registration surfaces
+
+There are two different registration paths:
+
+- `client.commands.register(...)` for application commands and modals
+- `client.components.register(...)` for message components such as buttons and selects
+
+That split reflects Discord’s interaction model rather than trying to collapse unlike things into a single registry.
+
+## Recommended public entry points
+
+If you are writing application code rather than extending the framework internals, start here:
+
+- slash commands: `defineCommand`, `opt.*`
+- buttons: `Button.*`
+- classic layouts: `ActionRow.of(...)`
+- V2 layouts: `Container.stack(...)`, `Section.text(...).accessory(...)`
+- modals: `modal(...).add(...).handle(...)`, `field.*`
+
+These are the highest-value interactive APIs in the current framework surface.

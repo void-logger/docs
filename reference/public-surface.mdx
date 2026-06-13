@@ -1,0 +1,66 @@
+---
+title: "Public surface"
+description: "A practical map of the framework’s exported surface, organized by the job you are trying to do."
+---
+
+## Client and runtime
+
+- `Client`: the main runtime, event emitter surface, and manager composition root
+- `TongueStore`: the shared flat cache
+- `ChameleonREST`: explicit REST client with `ChameleonAPIResult<T>`
+- `ChameleonGateway`: lower-level gateway transport object
+- `IntentBits` and intent types: gateway intent resolution inputs
+
+Reach for this group when you are bootstrapping a process, handling events, or tuning cache and sharding behavior.
+
+## Commands
+
+- `defineCommand`: define a slash command with typed execution context
+- `defineSubcommand`: compose subcommand trees
+- `opt.*`: typed slash option builders
+- `CommandContext`: interaction context for command handlers
+- `CommandManager`: command and modal registration surface
+
+This is the main application-command entry point for most bots.
+
+## Components and modals
+
+- `defineButton` and `Button.*`: reusable button definitions
+- `ActionRow`: classic component row layout
+- `field.*`: modal field builders
+- `modal(...)` and `defineModal`: modal definitions
+- `ComponentContext`: context for message component interactions
+- `ModalContext`: typed modal submit context
+- `Container`, `Section`, `TextDisplay`, `Thumbnail`, `Separator`, `Label`: Components V2 layout surface
+
+Use this group for interactive UI, button flows, selects, and typed modal forms.
+
+## Managers
+
+- entity managers: `UserManager`, `GuildManager`, `ChannelManager`, `MessageManager`
+- guild-scoped managers: `MemberManager`, `RoleManager`
+- utility managers: `CollectorManager`, `WebhookManager`, `InviteManager`
+- platform managers: `AutoModerationManager`, `ScheduledEventManager`, `EntitlementManager`, `StageInstanceManager`, `TemplateManager`, `ApplicationManager`, `SoundboardManager`
+
+If you are asking “where does this action live?”, the answer is usually in this group.
+
+## Utility surfaces
+
+- permissions helpers
+- collection and bitfield utilities
+- `AttachmentBuilder`
+- raw builders and entity resolvers
+
+These exports are lower-level, but useful when building tooling, custom helpers, or file-heavy workflows.
+
+## Use this page as a map
+
+If you know the category you need but not the exact symbol, this page is the fast entry point.
+
+For the fuller grouped reference, continue with:
+
+- [Client and runtime API](/reference/client-and-runtime-api)
+- [Commands, components, and modals API](/reference/commands-components-and-modals-api)
+- [Managers API](/reference/managers-api)
+
+For exact signatures and every export, jump to the generated [API reference](/reference/api-reference).

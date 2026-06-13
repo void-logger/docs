@@ -1,33 +1,23 @@
-> **First-time setup**: Customize this file for your project. Prompt the user to customize this file for their project.
-> For Mintlify product knowledge (components, configuration, writing standards),
-> install the Mintlify skill: `npx skills add https://mintlify.com/docs`
-
 # Documentation project instructions
 
 ## About this project
 
-- This is a documentation site built on [Mintlify](https://mintlify.com)
-- Pages are MDX files with YAML frontmatter
-- Configuration lives in `docs.json`
-- Run `mint dev` to preview locally
-- Run `mint broken-links` to check links
-
-## Terminology
-
-{/* Add product-specific terms and preferred usage */}
-{/* Example: Use "workspace" not "project", "member" not "user" */}
+- This is a Mintlify documentation site for the Chameleon Discord API framework.
+- Pages are MDX files with YAML frontmatter.
+- Site configuration lives in `docs.json`.
+- The generated low-level API reference still lives in `/docs` and can be linked from Mintlify pages.
 
 ## Style preferences
 
-{/* Add any project-specific style rules below */}
-
-- Use active voice and second person ("you")
-- Keep sentences concise — one idea per sentence
-- Use sentence case for headings
-- Bold for UI elements: Click **Settings**
-- Code formatting for file names, commands, paths, and code references
+- Write for developers building real bots.
+- Prefer direct explanation over marketing language.
+- Use second person only when giving actionable guidance.
+- Keep examples small and runnable.
+- Prefer describing actual behavior from `src`, not aspirational behavior.
+- Call out limitations or incomplete DX when they exist.
 
 ## Content boundaries
 
-{/* Define what should and shouldn't be documented */}
-{/* Example: Don't document internal admin features */}
+- Document only public or effectively public framework behavior.
+- Do not invent APIs that do not exist in `src`.
+- If a guide depends on a known limitation or workaround, say so explicitly.

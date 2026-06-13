@@ -1,0 +1,114 @@
+---
+title: "REST and managers"
+description: "Understand the manager model, the shared REST result shape, and when to reach for a manager versus raw REST."
+---
+
+## The manager model
+
+Most day-to-day framework operations live on managers attached to the client:
+
+- `client.messages`
+- `client.channels`
+- `client.guilds`
+- `client.users`
+- `client.webhooks`
+- `client.invites`
+- `client.collectors`
+
+They centralize four things that would otherwise get repeated everywhere:
+
+- route wiring
+- payload normalization
+- cache updates
+- a consistent success or failure shape
+
+## The shared result shape
+
+Most manager methods resolve to:
+
+```ts
+type ChameleonAPIResult<T> =
+  | { ok: true, data: T }
+  | { ok: false, status: number, code?: number, error: string, message: string, raw?: unknown }
+```
+
+That means normal HTTP failures are values, not exceptional control flow.
+
+```ts
+const result = await client.messages.send(channelId, 'pong!')
+
+if (!result.ok) {
+  console.error(result.status, result.error)
+  return
+}
+
+console.log(result.data.id)
+```
+
+## When to use a manager
+
+Use a manager when you want:
+
+- built-in cache hydration
+- built-in object builders
+- idiomatic framework payload handling
+- operations that match normal bot development flows
+
+That is most of the time.
+
+## When to use the raw REST client
+
+Use `client.rest` when:
+
+- Discord added an endpoint the higher-level manager does not expose yet
+- you are prototyping a new manager surface
+- you are writing tooling that does not need cache integration
+- you deliberately want raw route-level control
+
+That split is intentional. Chameleon does not force every REST call through a high-level abstraction.
+
+## Example: manager-driven read flow
+
+```ts
+const result = await client.guilds.fetch(guildId)
+
+if (!result.ok) {
+  console.error(result.status, result.error)
+  return
+}
+
+const guild = result.data
+```
+
+## Example: nested guild-scoped managers
+
+```ts
+const members = client.guilds.members(guildId)
+const roles = client.guilds.roles(guildId)
+
+const member = await members.fetch(userId)
+const role = await roles.fetch(roleId)
+```
+
+This keeps the guild ID scoped into the manager instead of being repeated on every call.
+
+## Cache expectations
+
+Managers use the shared `TongueStore`, but you should not assume everything is already cached.
+
+Practical rules:
+
+- `fetch(..., false)` is cache-first when the manager supports caching
+- list methods often hydrate cache entries as a side effect
+- some operations, such as `clone`, depend on a cached source entity
+- member cache keys are guild-scoped, not global by user ID
+
+If you treat the cache as a performance layer rather than the source of truth, the model stays straightforward.
+
+## Use the detailed manager guides next
+
+This page is the overview. For concrete method families and examples, continue with:
+
+- [Message and channel managers](/guides/message-and-channel-managers)
+- [Guilds, members, and roles](/guides/guilds-members-and-roles)
+- [Webhooks, invites, and application flows](/guides/webhooks-invites-and-application-flows)

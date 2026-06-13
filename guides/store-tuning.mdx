@@ -1,0 +1,48 @@
+---
+title: "Store tuning"
+description: "Adjust cache sizes and understand what the store is optimized for."
+---
+
+## Configure cache sizes
+
+```ts
+const client = new Client({
+  token,
+  intents,
+  cache: {
+    messages: 500,
+    users: 20000,
+    members: 5000,
+    channels: 10000
+  }
+})
+```
+
+## What you are tuning
+
+`TongueStore` maintains separate collections for:
+
+- guilds
+- roles
+- channels
+- users
+- members
+- messages
+- emojis
+- stickers
+- stage instances
+- scheduled events
+- auto mod rules
+- integrations
+- voice states
+
+## Practical advice
+
+- Increase `messages` for bots that inspect edits, replies, or moderation context.
+- Increase `members` if you heavily hydrate or scan guild members.
+- Increase `users` if you resolve many interactions or cross-guild user references.
+- Keep values modest if your goal is low memory use over convenience.
+
+## Key tradeoff
+
+Chameleon’s value proposition is partly memory efficiency. If you increase every cache limit aggressively, you are fighting one of the framework’s main design choices.

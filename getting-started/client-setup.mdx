@@ -1,0 +1,74 @@
+---
+title: "Client setup"
+description: "Understand the client constructor, sharding options, cache tuning, and the runtime surfaces attached to the client."
+---
+
+## Client options
+
+The client constructor takes a `ClientOptions` object:
+
+```ts
+import { Client, IntentBits } from '@impulsedev/chameleon'
+
+const client = new Client({
+  token: process.env.DISCORD_TOKEN!,
+  intents: [
+    IntentBits.GUILDS,
+    IntentBits.GUILD_MESSAGES,
+    IntentBits.MESSAGE_CONTENT
+  ],
+  debug: true,
+  sharding: 'auto',
+  largeThreshold: 100
+})
+```
+
+## Main options
+
+- `token`: required bot token
+- `intents`: required gateway intents
+- `debug`: enables framework logging where supported
+- `sharding`: either `'auto'` or an explicit `{ shards, total }`
+- `largeThreshold`: forwarded to the gateway identify payload
+- `cache`: store sizing options
+
+## Managers exposed on the client
+
+The client wires the main operational surfaces up front:
+
+- `client.users`
+- `client.guilds`
+- `client.channels`
+- `client.messages`
+- `client.webhooks`
+- `client.invites`
+- `client.autoMod`
+- `client.scheduledEvents`
+- `client.entitlements`
+- `client.stageInstances`
+- `client.templates`
+- `client.application`
+- `client.soundboard`
+
+It also exposes:
+
+- `client.commands`
+- `client.components`
+- `client.collectors`
+- `client.rest`
+- `client.cache`
+
+Guild members and roles are intentionally scoped through `client.guilds`:
+
+- `client.guilds.members(guildId)`
+- `client.guilds.roles(guildId)`
+
+## Sharding notes
+
+When you pass `sharding: 'auto'`, the client can also pick up shard environment variables if your process manager sets them.
+
+This keeps the constructor usable in both local single-process development and managed shard environments.
+
+## Important distinction
+
+The client is not trying to make every entity an active object. The client and its managers are the operational layer. Cached entities are primarily data.

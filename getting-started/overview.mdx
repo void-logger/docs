@@ -1,0 +1,35 @@
+---
+title: "Overview"
+description: "What Chameleon is, what it optimizes for, and where it differs from more class-heavy Discord frameworks."
+---
+
+## What Chameleon is
+
+Chameleon is a Discord API framework for TypeScript projects that want:
+
+- lower memory overhead than class-heavy Discord client designs
+- flat caches instead of deeply nested cache trees
+- typed gateway events through discriminated unions
+- explicit REST result objects instead of exception-driven flow
+- builder-style APIs for commands, components, and modals
+
+## What makes it different
+
+Chameleon intentionally avoids a few common patterns:
+
+- Cached entities are plain objects, not rich runtime instances.
+- Relationships are often stored as IDs, not embedded object graphs.
+- Timestamps are normalized to Unix milliseconds.
+- Many framework APIs return `{ ok: true, data }` or `{ ok: false, error, status, ... }`.
+
+## What the docs cover
+
+- Setup and bootstrapping a client
+- Store, cache, and event model
+- Commands, components, modals, and Components V2
+- Managers and REST flows
+- Links into the generated API reference
+
+## What the docs do not try to hide
+
+Chameleon is still evolving. Some surfaces are already ergonomic, especially around typed modals and the newer fluent V2 builders. Other areas still expose more low-level structure than ideal. These docs describe the framework as it exists now.

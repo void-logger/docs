@@ -1,0 +1,46 @@
+---
+title: "Current limitations"
+description: "Known rough edges and design areas that are still evolving."
+---
+
+## Why this page exists
+
+Production docs should not pretend every surface is equally mature. Chameleon has strong ideas and some genuinely good typed flows, but there are still rough edges worth calling out directly.
+
+## Current limitations
+
+### Components V2 are improved, not finished
+
+The newer fluent helpers are much better than raw payloads, but the V2 layout DSL is still more structural than ideal.
+
+### Public DX is ahead of some internal typing
+
+Some public builder APIs are now typed and documented well, while internal implementation still uses `Record<string, unknown>` in several places.
+
+### Generated reference and authored docs are separate
+
+There are effectively two doc surfaces:
+
+- Mintlify docs for concepts and guides
+- generated TypeDoc for raw API listings
+
+That is workable, but it means documentation cohesion depends on maintenance discipline.
+
+### Some roadmap goals are still directional
+
+Examples:
+
+- compile-time intent guarantees across the full framework
+- fully raw-free public ergonomics
+- perfectly uniform builder ergonomics across all component families
+
+## Recommendation for production bots
+
+Use Chameleon where its strengths matter:
+
+- typed event handling
+- explicit REST results
+- lean cache model
+- builder-based interaction flows
+
+But validate advanced flows against real Discord behavior, especially around newer component surfaces.

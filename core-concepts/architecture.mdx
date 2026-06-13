@@ -1,0 +1,47 @@
+---
+title: "Architecture"
+description: "Understand the design choices behind the framework: POJOs, flat stores, typed events, and memory-aware data handling."
+---
+
+## POJO-first entities
+
+Chameleon stores cached data as plain objects. This reduces runtime overhead and avoids large class graphs sitting in memory.
+
+That affects how you should think about the framework:
+
+- entities are data, not rich active objects
+- managers perform actions
+- relations are often resolved lazily
+
+## Flat store
+
+Instead of nested caches like `guild.channels.cache`, Chameleon uses a flatter store model.
+
+That keeps references simpler and reduces duplication pressure across cached structures.
+
+## Typed events
+
+Gateway events are exposed as discriminated unions. This gives you reliable narrowing based on `event.type`.
+
+That is one of the strongest parts of the framework’s type story.
+
+## REST results over exceptions
+
+Many framework APIs return result objects:
+
+```ts
+const result = await client.messages.send(channelId, 'hello')
+
+if (!result.ok) {
+  console.error(result.error, result.status)
+  return
+}
+
+console.log(result.data.id)
+```
+
+This keeps control flow explicit and predictable.
+
+## Where the framework is still evolving
+
+The broad architecture is coherent, but not every high-level API is equally polished yet. Builders and modal flows have improved a lot, while some lower-level surfaces still expose more raw structure than ideal.
